@@ -1,0 +1,36 @@
+{{ partials.head }}
+{{ partials.nav }}
+
+<div class="wrap journal">
+
+	<h1 class="page-title">Journal</h1>
+
+	{% set groups = config.journal_posts | group_by(attribute="data.group") %}
+	{% set_global _groups = [] %}
+	{% for group, ignored in groups %}
+		{% set_global _groups = _groups | concat(with=group) %}
+	{% endfor %}
+
+	{% for group in _groups | reverse %}
+
+		<h2>{{ group }}</h2>
+
+		<div class="posts">
+
+		{% for post in groups[group] %}
+		
+			<div class="post">
+				<h2 class="title">
+					<a href="/journal/{{ post.id }}">{{ post.data.title }}</a>
+				</h2>
+
+				<div class="meta">{{ post.data.date }} &bull; 5 min read</div>
+			</div>
+
+		{% endfor %}
+
+	{% endfor %}
+
+</div>
+
+{{ partials.foot }}

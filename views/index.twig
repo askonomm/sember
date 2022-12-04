@@ -33,6 +33,10 @@
             <h2 class="section-name">Me, here</h2>
 
             <ul class="site-links">
+                {% if page.show_journal %}
+                    <li><a href="/journal">📰 Journal</a></li>
+                {% endif %}
+
                 {% if page.show_cv %}
                     <li><a href="/cv">👔 Résumé</a></li>
                 {% endif %}

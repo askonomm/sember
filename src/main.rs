@@ -1,12 +1,14 @@
 use std::{fs, collections::HashMap};
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
+use siena::siena::{Siena, Store, Record, RecordSortOrder};
 use tera::{Context, Tera};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 struct SiteConfig {
     accent: Option<String>,
     show_cv: Option<bool>,
+    show_journal: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -54,6 +56,7 @@ struct Config {
     links: Option<Vec<LinkConfig>>,
     jobs: Option<Vec<JobConfig>>,
     education: Option<Vec<EducationConfig>>,
+    journal_posts: Option<Vec<Record>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -84,7 +87,8 @@ fn compose_page_data(name: &str, config: &Config) -> HashMap<String, TemplateDat
     // set page title
     let title = match name {
         "index" => config.about.name.clone(),
-        "cv" => format!("{} — Résumé", config.about.name.clone()),
+        "cv" => format!("Résumé — {}", config.about.name.clone()),
+        "journal" => format!("Journal — {}", config.about.name.clone()),
         _ => String::new(),
     };
 
@@ -97,6 +101,10 @@ fn compose_page_data(name: &str, config: &Config) -> HashMap<String, TemplateDat
     // show cv?
     let show_cv = config.site.clone().unwrap_or_default().show_cv.unwrap_or(false);
     page_data.insert(s("show_cv"), TemplateData::Bool(show_cv));
+
+    // show journal?
+    let show_journal = config.site.clone().unwrap_or_default().show_journal.unwrap_or(false);
+    page_data.insert(s("show_journal"), TemplateData::Bool(show_journal));
 
     return page_data;
 }
@@ -152,10 +160,23 @@ fn no_config() -> bool {
     return true;
 }
 
+fn read_journal_posts() -> Vec<Record> {
+    let store = Siena::default().set_store(Store::Local {
+        directory: "./".to_string()
+    });
+
+    return store.collection("journal")
+        .when_is("status", "published")
+        .sort("date", RecordSortOrder::Desc)
+        .get_all();
+}
+
 /// Reads the `sember.toml` file into a `Config` struct.
 fn read_config() -> Config {
     let config_str = fs::read_to_string("./sember.toml").unwrap_or(String::default());
-    let config: Config = toml::from_str(&config_str).unwrap();
+    let mut config: Config = toml::from_str(&config_str).unwrap();
+    
+    config.journal_posts = Some(read_journal_posts());
 
     return config;
 }
@@ -176,6 +197,13 @@ fn build_cv(config: &Config) {
 
     fs::create_dir_all("./public/cv").unwrap();
     fs::write("./public/cv/index.html", html).unwrap();
+}
+
+fn build_journal(config: &Config) {
+    let html = compile_template("journal", config);
+
+    fs::create_dir_all("./public/journal").unwrap();
+    fs::write("./public/journal/index.html", html).unwrap();
 }
 
 fn copy_assets(config: &Config) {
@@ -227,6 +255,9 @@ fn main() {
 
     // build cv
     build_cv(&config);
+
+    // build blog
+    build_journal(&config);
 
     // copy assets
     copy_assets(&config);

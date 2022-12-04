@@ -1,4 +1,17 @@
-<div class="wrap nav">
-    <a href="/">🏠 Home</a>
-    <a href="/cv" {% if page.name == "cv" %} class="active" {% endif %}>👔 Résumé</a>
+<div class="nav">
+    <a href="/" {% if config.about.photo %}class="is-photo"{% endif %}>
+        {% if config.about.photo %}
+            <img src="/{{ config.about.photo }}" alt="Home">
+        {% else %}
+            🏠 Home
+        {% endif %}
+    </a>
+
+    {% if page.show_journal %}
+        <a href="/journal" {% if page.name == "journal" %} class="active" {% endif %}>📰 Journal</a>
+    {% endif %}
+
+    {% if page.show_cv %}
+        <a href="/cv" {% if page.name == "cv" %} class="active" {% endif %}>👔 Résumé</a>
+    {% endif %}
 </div>

@@ -1,0 +1,19 @@
+.journal {
+  padding-top: 100px;
+}
+
+.journal .page-title {
+  font-size: 47px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #272727;
+  margin-left: -100px;
+  margin-bottom: 25px;
+}
+
+@media all and (max-width: 685px) {
+  .journal .page-title {
+    line-height: 1.25;
+    margin-left: 0;
+  }
+}

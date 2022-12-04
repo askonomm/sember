@@ -46,9 +46,10 @@ a {
   }
 }
 
-
 .nav {
-  margin-bottom: 75px;
+  position: absolute;
+  top: 20px;
+  left: 25px;
 }
 
 @media print {
@@ -59,8 +60,10 @@ a {
 
 .nav a {
   display: inline-block;
-  font-size: 17px;
+  font-size: 14px;
+  font-weight: 500;
   border: 0;
+  vertical-align: top;
   margin-right: 15px;
 }
 
@@ -72,4 +75,21 @@ a {
   color: #111;
   font-weight: 500;
   border-bottom: 1px solid #111;
+}
+
+.nav a img {
+  width: 40px;
+  height: 40px;
+  border-radius: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  border: 1px solid #ddd;
+}
+
+.nav a.is-photo {
+  top: -7px;
+}
+
+.nav a.is-photo,
+.nav a.is-photo:hover {
+  border: 0;
 }
